@@ -1,0 +1,15 @@
+.custom-button {
+    padding: 12px;
+    background-color: #3880ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .custom-button:hover {
+    background-color: #3171e0;
+  }
+  

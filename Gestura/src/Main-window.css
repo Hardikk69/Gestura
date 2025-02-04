@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+#container {
+    width: 500px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+video {
+    width: 100%;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+textarea {
+    width: 100%;
+    height: 50px;
+    margin-top: 10px;
+}
+.btn-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+button {
+    width: 32%;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: white;
+}
+.clear { background-color: #f0e68c; color: black; }
+.save { background-color: #28a745; }
+.quit { background-color: #dc3545; }

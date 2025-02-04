@@ -1,0 +1,59 @@
+/* Center the signup form */
+.signup-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    padding: 30px;
+    border-radius: 20px;
+    background-color: #f4f4f4; /* Light background */
+
+    /* Centering the div */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Style for input fields */
+.signup-container input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Style for the sign-up button */
+.signup-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* Hover effect for the button */
+.signup-container button:hover {
+    background-color: #0056b3;
+}
+
+/* Centering footer text */
+.ion-footer p {
+    font-size: 14px;
+}
+
+.ion-footer a {
+    color: #007bff;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.ion-footer a:hover {
+    text-decoration: underline;
+}

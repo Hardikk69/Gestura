@@ -1,5 +1,7 @@
-import { IonApp, setupIonicReact } from '@ionic/react';
-
+import { IonApp, IonButton, setupIonicReact } from '@ionic/react';
+import Login from './Login';
+import Register from './Register';
+import SignLanguage from './Main-window';
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -32,9 +34,19 @@ import './theme/variables.css';
 
 setupIonicReact();
 
+import { IonRouterOutlet } from '@ionic/react';
+import { IonReactRouter } from '@ionic/react-router';
+import { Route } from 'react-router-dom';
+
 const App: React.FC = () => (
   <IonApp>
-    <h2>Hello world!</h2>
+    <IonReactRouter>
+      <IonRouterOutlet>
+        <Route exact path="/login" component={Login} />
+        <Route exact path="/register" component={Register} />
+        <Route exact path="/main" component={SignLanguage} />
+      </IonRouterOutlet>
+    </IonReactRouter>
   </IonApp>
 );
 
