@@ -9,7 +9,7 @@ interface ButtonProps {
 
 const CustomButton: React.FC<ButtonProps> = ({ text, onClick,className }) => {
   return (
-    <button className="custom-button" onClick={onClick}>
+    <button className={className} onClick={onClick}>
       {text}
     </button>
   );

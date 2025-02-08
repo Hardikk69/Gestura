@@ -3,14 +3,21 @@ import { IonPage, IonContent } from '@ionic/react';
 import InputField from './components/InputField';
 import CustomButton from './components/CustomButton';
 import './Login.css';
-
+import api from './api/api';
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = () => {
-        console.log('Logging in with:', { username, password });
+    const handleLogin = async () => {
+        console.log("Login button clicked!");  // Debugging log
+        try {
+            const response = await api.post('/login', { name: username, password });
+            console.log('Login Response:', response.data);
+        } catch (error) {
+            console.error('Error logging in:', error);
+        }
     };
+    
 
     return (
         <IonPage>
@@ -42,8 +49,6 @@ const Login: React.FC = () => {
                         <p className="signup-text">
                             Don't have an account? <a href="/register" className="signup-link">Sign Up</a>
                         </p>
-
-
                     </div>
                 </div>
             </IonContent>
