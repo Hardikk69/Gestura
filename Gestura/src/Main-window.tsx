@@ -17,7 +17,8 @@ const SignLanguage: React.FC = () => {
 
     const interval = setInterval(() => {
       captureAndSendFrame();
-    }, 2000);
+      fetchProcessedImage();
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -39,7 +40,7 @@ const SignLanguage: React.FC = () => {
           formData.append('file', blob, 'frame.jpg');
 
           try {
-            const response = await fetch("http://localhost:8000/predict", {
+            const response = await fetch("http://localhost:8000/main", {
               method: "POST",
               body: formData
             });
@@ -49,15 +50,22 @@ const SignLanguage: React.FC = () => {
             if (data.prediction) {
               setPredictedText(prev => prev + data.prediction);
             }
-
-            if (data.image_url) {
-              setImageUrl(data.image_url);
-            }
           } catch (error) {
             console.error("Fetch Error:", error);
           }
         }
       }, "image/jpeg");
+    }
+  };
+
+  const fetchProcessedImage = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/processed_image");
+      if (response.ok) {
+        setImageUrl("http://localhost:8000/processed_image?timestamp=" + new Date().getTime());
+      }
+    } catch (error) {
+      console.error("Fetch Processed Image Error:", error);
     }
   };
 
@@ -73,12 +81,12 @@ const SignLanguage: React.FC = () => {
 
   const quitApp = () => {
     alert("Closing the application!");
+    window.location.href = "/login";
     window.close();
   };
 
   return (
     <IonPage>
-      <IonContent>
         <div id="container" className="ion-padding">
           <video id="video" autoPlay playsInline></video>
           {imageUrl && <IonImg src={imageUrl} />}
@@ -89,9 +97,8 @@ const SignLanguage: React.FC = () => {
             <IonButton expand="block" color="tertiary" onClick={quitApp}>Quit</IonButton>
           </div>
         </div>
-      </IonContent>
     </IonPage>
   );
 };
- 
+
 export default SignLanguage;
