@@ -1,3 +1,4 @@
+import time
 import cv2
 from fastapi.responses import FileResponse
 import redis
@@ -5,12 +6,10 @@ import pickle
 import shutil
 import numpy as np
 import mediapipe as mp
-from fastapi import Body, FastAPI
+from fastapi import Body, FastAPI, File, UploadFile, HTTPException
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, File, UploadFile
-from fastapi import HTTPException
 
 class Login(BaseModel):
     name: str
@@ -51,9 +50,10 @@ def read_all_users_register():
 def read_all_users_login():
     return {"users": get_all_users(redis_client_login)}
 
-@app.post("/register")
+@app.post("/register/")
 def create_user(user: Register): 
-    print(f"Received data: {user}")
+    if user.password != user.confirm_password:
+        raise HTTPException(status_code=400, detail="❌ Passwords do not match.")
 
     if redis_client_register.exists(user.name):
         raise HTTPException(status_code=400, detail="❌ Username already taken.")
@@ -64,6 +64,7 @@ def create_user(user: Register):
     redis_client_register.hset(user.name, "email", user.email)
     redis_client_register.hset(user.name, "confirm_password", user.confirm_password)
     redis_client_register.hset(user.name, "registered_at", timestamp)
+
     return {"message": "✅ User registered successfully", "registered_at": timestamp}
 
 @app.post("/login")
@@ -86,12 +87,28 @@ mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 hands = mp_hands.Hands(static_image_mode=True, min_detection_confidence=0.3)
+frame_counter = 0
 
-labels_dict = {i: chr(65 + i) for i in range(26)}
+labels_dict = {
+    0: "Is ", 1: "Name ", 2: "computing ", 3: "My ", 4: "E ", 5: "Okay ",
+    6: " ", 7: "Hardik ", 8: "I ", 9: "Jhanvi ", 10: "Kotlin ", 11: "L ",
+    12: "Morning ", 13: "am ", 14: "our ", 15: "Project ", 16: "Good ",
+    17: " ", 18: "Sir ", 19: "This ", 20: "Hello ", 21: "Gestura ",
+    22: "Language ", 23: "It ", 24: "Called ", 25: "Technology ", 
+    26: "Team ", 27: "Learning ", 28: "Good"
+}
+
+last_prediction_time = 0
+prediction_cooldown = 1.5 
 
 @app.post("/main")
 async def predict(file: UploadFile = File(...)):
+    global frame_counter, last_prediction_time
     try:
+        current_time = time.time()
+        if current_time - last_prediction_time < prediction_cooldown:
+            return {"message": "⌛ Waiting for cooldown to finish..."}
+
         temp_file = "received_frame.jpg"
         with open(temp_file, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -105,18 +122,9 @@ async def predict(file: UploadFile = File(...)):
         results = hands.process(frame_rgb)
 
         if results.multi_hand_landmarks:
-            data_aux = []
-            x_ = []
-            y_ = []
-
             for hand_landmarks in results.multi_hand_landmarks:
-                mp_drawing.draw_landmarks(
-                    frame, 
-                    hand_landmarks, 
-                    mp_hands.HAND_CONNECTIONS,
-                    mp_drawing_styles.get_default_hand_landmarks_style(),
-                    mp_drawing_styles.get_default_hand_connections_style()
-                )
+                data_aux = []
+                x_, y_ = [], []
 
                 for landmark in hand_landmarks.landmark:
                     x_.append(landmark.x)
@@ -141,12 +149,17 @@ async def predict(file: UploadFile = File(...)):
                 y2 = int(max(y_) * H) + 10
 
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                cv2.putText(frame, predicted_character, (x1, y1 - 10), 
+                cv2.putText(frame, predicted_character, (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 255, 0), 3, cv2.LINE_AA)
 
-                print(f"✅ Detected Letter: {predicted_character}")
+                frame_counter += 1
+                if frame_counter % 40 == 0:
+                    print(f"✅ Detected Letter: {predicted_character}")
 
                 cv2.imwrite("processed_frame.jpg", frame)
+
+                last_prediction_time = current_time
+
                 return {
                     "prediction": predicted_character,
                     "image_url": "http://localhost:8000/processed_image"
@@ -167,7 +180,6 @@ def delete_user(username: str):
         raise HTTPException(status_code=404, detail="❌ User not found.")
     redis_client_register.delete(username)
     return {"message": "✅ User deleted successfully."}
-
 
 @app.get("/users")
 def get_users():

@@ -79,6 +79,12 @@ const SignLanguage: React.FC = () => {
     anchor.click();
   };
 
+  const removeLastWord = () => {
+    const words = predictedText.trim().split(/\s+/);
+    words.pop();
+    setPredictedText(words.join(" ") + (words.length ? " " : ""));
+  };
+
   const quitApp = () => {
     alert("Closing the application!");
     window.location.href = "/login";
@@ -87,16 +93,17 @@ const SignLanguage: React.FC = () => {
 
   return (
     <IonPage>
-        <div id="container" className="ion-padding">
-          <video id="video" autoPlay playsInline></video>
-          {imageUrl && <IonImg src={imageUrl} />}
-          <IonTextarea value={predictedText} readonly></IonTextarea>
-          <div className="btn-group">
-            <IonButton expand="block" color="danger" onClick={clearText}>Clear All</IonButton>
-            <IonButton expand="block" color="primary" onClick={saveText}>Save to a Text File</IonButton>
-            <IonButton expand="block" color="tertiary" onClick={quitApp}>Quit</IonButton>
-          </div>
+      <div id="container" className="ion-padding">
+        <video id="video" autoPlay playsInline></video>
+        {imageUrl && <IonImg src={imageUrl} />}
+        <IonTextarea value={predictedText} readonly></IonTextarea>
+        <div className="btn-group">
+          <IonButton expand="block" color="medium" onClick={removeLastWord}>Backspace</IonButton>
+          <IonButton expand="block" color="danger" onClick={clearText}>Clear All</IonButton>
+          <IonButton expand="block" color="primary" onClick={saveText}>Save to a Text File</IonButton>
+          <IonButton expand="block" color="tertiary" onClick={quitApp}>Quit</IonButton>
         </div>
+      </div>
     </IonPage>
   );
 };

@@ -51,16 +51,16 @@ const Register: React.FC = () => {
             hasError = true;
         }
     
-        if (password !== confirmPassword && password.length != 8) {
+        if (password !== confirmPassword) {
             setPasswordError('❌ Passwords do not match.');
             hasError = true;
-        }
+        }     
     
         if (hasError) return;
     
         try {
             console.log('Sending data to backend...');
-            const response = await api.post('/register', {
+            const response = await api.post('/register/', {
                 name: username,
                 email: email,
                 password: password,
